@@ -10,18 +10,18 @@
     <script>
         $(function(){
             var socket = io();
-            $('form').submit(function(e){
-                e.preventDefault();
-                socket.emit('chat message',$('#txt_message').val());
-                $('#messages').append($('<li>').append($('<font color="black">').text(socket.id+ " : " +$('#txt_message').val())));
-                $('#txt_message').val('');
-                return false;
-            });
-
             socket.on('return message',function(msg,id){
                 $('#messages').append($('<li>').append($('<font color="green">').text(id+ " : " +msg)));
-                   
             });
+            $('form').submit(function(e){
+                 e.preventDefault();
+                socket.emit('chat message',$('#txt_message').val());
+                // $('#messages').append($('<li>').append($('<font color="black">').text(socket.id+ " : " +$('#txt_message').val())));
+                $('#txt_message').val('');
+                // return false;
+            });
+
+
         });
 
 

@@ -23,7 +23,10 @@ io.on("connection",function(socket){
     });
     socket.on("chat message",function(msg){
         console.log(socket.id + ": " + msg)
-        socket.broadcast.emit("return message",msg,socket.id);
+        //only send to other client
+        io.broadcast.emit("return message",msg,socket.id);
+        //send to all client
+        //io.sockets.emit("return message",msg,socket.id);
     });
 });
 
