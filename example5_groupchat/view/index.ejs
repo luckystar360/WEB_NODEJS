@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chatbox</title>
+    <script src="jquery.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        var socket = io();
+
+        socket.on("client-register-fail",function(data){
+            alert("Người dùng " + data + " đã tồn tại hoặc không khả dụng !!!")
+        });
+
+        socket.on("client-register-success",function(data){
+            $("#login").hide(500);
+            $("#chatbox").show(1000);
+            $("#spname").html("<font style=\"color:green;\">" + data+" </font>");
+        })
+
+        socket.on("update-list-account",function(data){
+            $(".userList").html("");
+            data.forEach(element => {
+                console.log(element);     
+                $(".userList").append("<li>"+element+ "</li>");
+            });
+        });
+
+        socket.on("update-message",function(data){
+            $("#messagebox").append(data.name + " : " + data.mess + "</br>");
+            $("#messagebox").change();
+        });
+
+        $(document).ready(function(){
+            $("#chatbox").hide();
+            $("#btnRegister").click(function(){
+                var account = $("#txtAccount").val();
+                console.log(account);
+                socket.emit("client-send-account",account);
+            });
+            $( "#form-message").submit(function( event ) {
+              //alert( "Handler for .submit() called." );
+              socket.emit("client-send-message",$("#txtSendMessage").val());
+              $("#txtSendMessage").val("");
+              event.preventDefault();
+            });
+ 
+            $("#messagebox").change(function(){
+                 $("#messagebox").scrollTop($("#messagebox").height());
+                // var elem = document.getElementById('messagebox');
+                // elem.scrollTop = elem.scrollHeight;
+            });
+
+            $("#logOut").click(function(){
+                socket.emit("client-log-out");
+                $("#chatbox").hide(500);
+                $("#login").show(1000);
+            });
+        });
+    </script>
+    
+</head>
+<body>
+    <div id="wrapper">
+        <div id="login">
+            <h3>Your Name:</h3>
+            <input id="txtAccount" type="text" width="100"/>
+            <input id="btnRegister" type="button" value="Đăng kí"/>
+        </div>
+        <div id="chatbox">
+            <div id="header" style="text-align: right;">
+                Hi <span id="spname"></span> , 
+                <div id="logOut" style="font-weight: bold; float: right;"> Logout</div>
+            </div>
+            <div id="left-chatbox">
+                <div style="border: 1px;border-style:solid;">
+                    Người dùng
+                </div>
+                <div class="userList" style="list-style: none; margin: 5px;">
+
+                </div>
+            </div>
+            <div id="right-chatbox">
+                <div id="messagebox" style="height: 85%;">
+                    
+                </div>
+                <div id="user-message" style="height: 15%;">
+                    <form id="form-message">
+                        <input id="txtSendMessage" type="text" />
+                        <input id="btnSendMessage"   type="submit" value="Gửi">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
